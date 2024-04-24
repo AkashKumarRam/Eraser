@@ -26,29 +26,56 @@ function SideNav() {
         activeTeam && getFiles()
     }, [activeTeam])
 
+    // const onFileCreate = (fileName: string) => {
+    //     createFile({
+    //         fileName: fileName,
+    //         teamId: activeTeam?._id,
+    //         createdBy: user?.email,
+    //         archive: false,
+    //         document: '',
+    //         whiteboard: ''
+    //     }).then((resp) => {
+    //         if (resp) {
+    //             getFiles()
+    //             toast("File Created Successfully!")
+    //         }
+    //     }, (e) => {
+    //         toast("Error while creating file")
+    //     })
+    // }
+
     const onFileCreate = (fileName: string) => {
+        const userEmail = user?.email || ''; // Provide a default value if user or email is undefined
+        const teamIdString = activeTeam?._id?.toString() || ''; // Convert to string explicitly
         createFile({
             fileName: fileName,
-            teamId: activeTeam?._id,
-            createdBy: user?.email,
+            teamId: teamIdString,
+            createdBy: userEmail,
             archive: false,
             document: '',
             whiteboard: ''
         }).then((resp) => {
             if (resp) {
-                getFiles()
-                toast("File Created Successfully!")
+                getFiles();
+                toast("File Created Successfully!");
             }
         }, (e) => {
-            toast("Error while creating file")
-        })
-    }
+            toast("Error while creating file");
+        });
+    };
+    
+    // const getFiles = async () => {
+    //     const result = await convex.query(api.files.getFiles, { teamId: activeTeam?._id })
+    //     setFileList_(result)
+    //     setTotalFiles(result?.length)
+    // }
 
     const getFiles = async () => {
-        const result = await convex.query(api.files.getFiles, { teamId: activeTeam?._id })
-        setFileList_(result)
-        setTotalFiles(result?.length)
-    }
+        const teamId = (activeTeam?._id ?? '').toString(); // Ensure teamId is a string
+        const result = await convex.query(api.files.getFiles, { teamId });
+        setFileList_(result);
+        setTotalFiles(result?.length);
+    };
 
     return (
         <div className='flex flex-col h-screen fixed w-72 border-r border-[1px] p-6'>
